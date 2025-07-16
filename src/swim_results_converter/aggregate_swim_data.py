@@ -65,25 +65,23 @@ def aggregate_data(df):
     return aggregated
 
 # Main function
-def main():
-    parser = argparse.ArgumentParser(description="Aggregate standardized swim meet result CSV files")
-    parser.add_argument('--input-dir', default='standardized_results', help='Directory containing standardized CSV files')
-    parser.add_argument('--output-dir', default='aggregated_results', help='Directory to save aggregated CSV files')
-    args = parser.parse_args()
+def main(args):
+    input_dir = args.input_dir
+    output_dir = args.output_dir
     
     # Create output directory if it doesn't exist
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-        logger.info(f"Created output directory: {args.output_dir}")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        logger.info(f"Created output directory: {output_dir}")
     
     # Process all CSV files in the input directory
-    csv_files = [f for f in os.listdir(args.input_dir) if f.endswith('.csv')]
+    csv_files = [f for f in os.listdir(input_dir) if f.endswith('.csv')]
     if not csv_files:
-        logger.warning(f"No CSV files found in {args.input_dir}")
+        logger.warning(f"No CSV files found in {input_dir}")
         return
     
     for file_name in csv_files:
-        file_path = os.path.join(args.input_dir, file_name)
+        file_path = os.path.join(input_dir, file_name)
         df, input_filename = process_file(file_path)
         
         if df is not None:
@@ -92,7 +90,7 @@ def main():
             
             # Generate output filename based on input filename
             output_filename = input_filename.replace('standardized_', 'aggregated_')
-            output_file = os.path.join(args.output_dir, output_filename)
+            output_file = os.path.join(output_dir, output_filename)
             
             # Save to CSV
             aggregated_df.to_csv(output_file, index=False)
@@ -105,4 +103,8 @@ def main():
             logger.error(f"Skipping aggregation for {file_name} due to processing errors")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Aggregate standardized swim meet result CSV files")
+    parser.add_argument('--input-dir', required=True, help='Directory containing standardized CSV files')
+    parser.add_argument('--output-dir', required=True, help='Directory to save aggregated CSV files')
+    args = parser.parse_args()
+    main(args)

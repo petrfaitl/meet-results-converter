@@ -23,9 +23,9 @@ def convert_time_to_seconds(time_str):
         # Check if time is in MM:SS.SS format
         if ':' in str(time_str):
             minutes, seconds = map(float, time_str.split(':'))
-            return round(minutes * 60 + seconds,2)
+            return round(minutes * 60 + seconds, 2)
         # Otherwise, assume SS.SS format
-        return round(float(time_str),2)
+        return round(float(time_str), 2)
     except (ValueError, TypeError) as e:
         logger.error(f"Error converting time {time_str}: {e}")
         return None
@@ -77,22 +77,18 @@ def extract_meet_info(file_path):
     
     return meet_name, meet_date
 
-
 # Function to calculate time difference
 def calculate_time_diff(seed_time, final_time):
-
     if pd.isna(seed_time) or pd.isna(final_time) or 'DNF' in str(final_time).upper():
         return None
     time_diff = final_time - seed_time
-    if (time_diff > 0):
+    if time_diff > 0:
         return None
-    return round(time_diff,2)
+    return round(time_diff, 2)
 
 # Calculate bonus points
 def calculate_bonus_points(seed_time, improvement, dq, qualification, event):
-
- 
-    # If swimmer was disqualified, return no bonus
+    # If swimmer was disqualified or event is a relay, return no bonus
     if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
         return None
 
@@ -102,7 +98,7 @@ def calculate_bonus_points(seed_time, improvement, dq, qualification, event):
     if not seed_time or 'NT' in str(seed_time).upper():
         bonus_points += 1
 
-    # Bonus for improvement (assumes improvement is a positive number)
+    # Bonus for improvement (assumes improvement is a negative number)
     if improvement and float(improvement) < 0:
         bonus_points += 2
 
@@ -113,8 +109,6 @@ def calculate_bonus_points(seed_time, improvement, dq, qualification, event):
         bonus_points += 3
 
     return str(bonus_points) if bonus_points else None
-
-
 
 # Function to process a single Excel file
 def process_file(file_path, output_dir):
@@ -135,12 +129,11 @@ def process_file(file_path, output_dir):
             # Check if the row contains an event name
             if pd.notna(row.iloc[0]) and 'Event' in str(row.iloc[0]):
                 current_event = row.iloc[0].strip()
-                
                 index = current_event.find("  ")
                 current_event = str(current_event[index+1:]).strip()
                 current_event = str(current_event).replace(')', '') if ")" in current_event else current_event
                 continue
-            # Skip rows that are not swimmer results (e.g., headers, ADV/DEV times)
+            # Skip rows that are not swimmer results
             if pd.isna(row.iloc[0]) or 'Name' in str(row.iloc[0]) or 'ADV' in str(row.iloc[1]) or 'DEV' in str(row.iloc[1]) or 'Team' in str(row.iloc[0]):
                 continue
             # Extract swimmer data
@@ -153,8 +146,8 @@ def process_file(file_path, output_dir):
             rank = row.iloc[13] if pd.notna(row.iloc[13]) else None
             qualification = row.iloc[9] if pd.notna(row.iloc[9]) else None
 
-            # Trigger dq flag
-            dq= None
+            # Trigger DQ flag
+            dq = None
             if "---" in str(rank):
                 dq = "DQ"
             
@@ -173,7 +166,6 @@ def process_file(file_path, output_dir):
             improvement = calculate_time_diff(seed_time_seconds, finals_time_seconds)
 
             # Calculate bonus points
-            #bonus_points = None
             bonus_points = calculate_bonus_points(seed_time, improvement, dq, qualification, current_event)
             
             # Create standardized record
@@ -214,26 +206,28 @@ def process_file(file_path, output_dir):
         return None
 
 # Main function to process multiple files
-def main():
+def main(args):
+    input_dir = args.input_dir
+    output_dir = args.output_dir
+    
+    # Create output directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        logger.info(f"Created output directory: {output_dir}")
+    
+    # Process all Excel files in the input directory
+    excel_files = [f for f in os.listdir(input_dir) if f.endswith(('.xls', '.xlsx'))]
+    if not excel_files:
+        logger.warning(f"No Excel files found in {input_dir}")
+        return
+    
+    for file_name in excel_files:
+        file_path = os.path.join(input_dir, file_name)
+        process_file(file_path, output_dir)
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Standardize swim meet result Excel files")
     parser.add_argument('--input-dir', default='meet_results', help='Directory containing Excel files')
     parser.add_argument('--output-dir', default='standardized_results', help='Directory to save standardized CSV files')
     args = parser.parse_args()
-    
-    # Create output directory if it doesn't exist
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-        logger.info(f"Created output directory: {args.output_dir}")
-    
-    # Process all Excel files in the input directory
-    excel_files = [f for f in os.listdir(args.input_dir) if f.endswith(('.xls', '.xlsx'))]
-    if not excel_files:
-        logger.warning(f"No Excel files found in {args.input_dir}")
-        return
-    
-    for file_name in excel_files:
-        file_path = os.path.join(args.input_dir, file_name)
-        process_file(file_path, args.output_dir)
-
-if __name__ == "__main__":
-    main()
+    main(args)

@@ -55,7 +55,7 @@ def run_script(script_name, args):
 
 def main():
     parser = argparse.ArgumentParser(description="Run swim data standardization and aggregation pipeline")
-    parser.add_argument('--input-dir', help='Directory containing input Excel files (prompted if not provided)')
+    parser.add_argument('--input-dir', default=None, help='Directory containing input Excel files (if omitted, you will be prompted interactively)')
     parser.add_argument('--standardized-dir', help='Directory for standardized CSV files (created as standardized_results if not provided)')
     parser.add_argument('--aggregated-dir', help='Directory for aggregated CSV files (created as aggregated_results if not provided)')
     args = parser.parse_args()
