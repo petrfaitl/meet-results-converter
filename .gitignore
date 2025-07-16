@@ -26,6 +26,16 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Own directories
+meet_results/
+meet_results_all
+aggregated_results/
+standardized_results/
+standardised_results/
+standardized_results_all
+aggregated_results_all
+
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
