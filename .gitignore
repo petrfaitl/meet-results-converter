@@ -34,6 +34,7 @@ standardized_results/
 standardised_results/
 standardized_results_all
 aggregated_results_all
+test_data
 
 
 # PyInstaller
