@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="swim_results_converter",
-    version="0.2.0",
+    version="0.2.2",
     description="Swim meet data standardization and aggregation pipeline",
     author="Petr Faitl",
     packages=find_packages(where="src"),

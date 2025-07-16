@@ -17,7 +17,7 @@ def process_file(file_path):
         
         # Ensure required columns exist
         required_columns = ['MeetName', 'Date', 'Gender', 'AgeGroup', 'SwimmerName', 'Age', 'Team', 
-                           'PlacePoints', 'BonusPoints', 'Qualification']
+                           'PlacePoints', 'PBPoints','TimePoints','TotalPoints','Qualification']
         if not all(col in df.columns for col in required_columns):
             logger.error(f"Missing required columns in {file_path}")
             return None, None
@@ -25,7 +25,9 @@ def process_file(file_path):
         # Handle missing or invalid data
         df = df.dropna(subset=['SwimmerName', 'Gender', 'AgeGroup', 'Team'])
         df['PlacePoints'] = pd.to_numeric(df['PlacePoints'], errors='coerce').fillna(0).astype(int)
-        df['BonusPoints'] = pd.to_numeric(df['BonusPoints'], errors='coerce').fillna(0).astype(int)
+        df['TimePoints'] = pd.to_numeric(df['TimePoints'], errors='coerce').fillna(0).astype(int)
+        df['PBPoints'] = pd.to_numeric(df['PBPoints'], errors='coerce').fillna(0).astype(int)
+        df['TotalPoints'] = pd.to_numeric(df['TotalPoints'], errors='coerce').fillna(0).astype(int)
         df['Qualification'] = df['Qualification'].fillna('').astype(str)
         
         # Calculate ADV and DEV counts
@@ -45,13 +47,16 @@ def aggregate_data(df):
     # Aggregate by SwimmerName, Gender, AgeGroup, Team, MeetName, and Date
     aggregated = individual_df.groupby(['MeetName', 'Date', 'Gender', 'AgeGroup', 'SwimmerName', 'Age', 'Team']).agg({
         'PlacePoints': 'sum',
-        'BonusPoints': 'sum',
+        'TimePoints': 'sum',
+        'PBPoints': 'sum',
+        'TotalPoints': 'sum',
         'QualificationADV': 'sum',
         'QualificationDEV': 'sum'
     }).reset_index()
     
     # Calculate TotalPoints
-    aggregated['TotalPoints'] = aggregated['PlacePoints'] + aggregated['BonusPoints']
+    # aggregated['TotalPoints'] = aggregated['PlacePoints'] + aggregated['TimePoints'] + aggregated['PBPoints']
+    aggregated['TotalPoints'] = aggregated['TotalPoints'] 
     
     # Rename columns for clarity
     aggregated = aggregated.rename(columns={

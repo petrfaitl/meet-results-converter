@@ -110,6 +110,54 @@ def calculate_bonus_points(seed_time, improvement, dq, qualification, event):
 
     return str(bonus_points) if bonus_points else None
 
+# Calculate PB points
+def calculate_pb_points(seed_time, improvement, dq, event):
+    # If swimmer was disqualified or event is a relay, return no PB points
+    if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
+        return None
+
+    pb_points = 0
+
+    # If there is no seed time, return no PB points
+    if not seed_time or 'NT' in str(seed_time).upper():
+        pb_points += 1
+
+    # If improvement is negative, it means the swimmer improved their time
+    if improvement and float(improvement) < 0:
+        pb_points += 2
+
+
+    return str(pb_points) if pb_points else None
+
+# Calculate time points
+def calculate_time_points( dq,qualification, event):
+    # If swimmer was disqualified or event is a relay, return no time points
+    if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
+        return None
+
+    time_points = 0
+
+    # Add bonus points based on qualification level
+    if 'ADV' in str(qualification).upper():
+        time_points += 6
+    if 'DEV' in str(qualification).upper():
+        time_points += 3
+
+    return str(time_points) if time_points else None
+
+# Calculate total points
+def calculate_total_points(place_points, pb_points, time_points):
+    logger.debug(f"Calculating total points: place_points={place_points}, pb_points={pb_points}, time_points={time_points}")
+    
+    # Convert points to integers if they are strings
+    place_points = int(place_points) if place_points is not None and str(place_points).strip() else 0
+    pb_points = int(pb_points) if pb_points is not None and str(pb_points).strip() else 0
+    time_points = int(time_points) if time_points is not None and str(time_points).strip() else 0
+
+    # Calculate total points
+    total_points = place_points + pb_points + time_points
+    return total_points if total_points > 0 else None
+
 # Function to process a single Excel file
 def process_file(file_path, output_dir):
     try:
@@ -142,7 +190,7 @@ def process_file(file_path, output_dir):
             team = row.iloc[3] if pd.notna(row.iloc[3]) else None
             seed_time = row.iloc[4] if pd.notna(row.iloc[4]) else None
             finals_time = row.iloc[7] if pd.notna(row.iloc[7]) else None
-            points = row.iloc[10] if pd.notna(row.iloc[10]) else 0
+            place_points = row.iloc[10] if pd.notna(row.iloc[10]) else None
             rank = row.iloc[13] if pd.notna(row.iloc[13]) else None
             qualification = row.iloc[9] if pd.notna(row.iloc[9]) else None
 
@@ -165,8 +213,14 @@ def process_file(file_path, output_dir):
             # Calculate improvement
             improvement = calculate_time_diff(seed_time_seconds, finals_time_seconds)
 
-            # Calculate bonus points
-            bonus_points = calculate_bonus_points(seed_time, improvement, dq, qualification, current_event)
+            # Calculate time points
+            time_points = calculate_time_points(dq, qualification, current_event)
+
+            # Calculate pb points
+            pb_points = calculate_pb_points(seed_time, improvement, dq, current_event)
+
+            # Calculate total points
+            total_points = calculate_total_points(place_points, pb_points, time_points)
             
             # Create standardized record
             record = {
@@ -186,8 +240,10 @@ def process_file(file_path, output_dir):
                 'Rank': rank,
                 'DQ': dq,
                 'Qualification': qualification,
-                'PlacePoints': points,
-                'BonusPoints': bonus_points,
+                'PlacePoints': place_points,
+                'PBPoints': pb_points,
+                'TimePoints': time_points,
+                'TotalPoints': total_points,
             }
             standardized_data.append(record)
         
