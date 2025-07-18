@@ -139,7 +139,9 @@ python src/swim_results_converter/standardize_swim_data.py
         -   `DQ`: "DQ" if disqualified, null otherwise.
         -   `Qualification`: Qualification status (e.g., "ADV", "DEV", or empty).
         -   `PlacePoints`: Points from placement (numeric, 0 if missing).
-        -   `BonusPoints`: Calculated points (1 for no seed time, 2 for improvement, 6 for ADV, 3 for DEV, null for relays or DQs).
+        -   `PBPoints`: Calculated points (1 for no seed time, 2 for improvement null for relays or DQs).
+        -   `TimePoints`: Calculated points (6 for ADV, 3 for DEV, null for relays or DQs).
+        -   `TotalPoints`: Calculated sum of all points
 
 -   **Aggregated CSVs** (in `aggregated_results/`):
     -   Example: `aggregated_2025-meet2-results.csv`.
@@ -152,8 +154,9 @@ python src/swim_results_converter/standardize_swim_data.py
         -   `Age`: Swimmer’s age.
         -   `Team`: Swimmer’s team.
         -   `PlacePoints`: Sum of place points for non-relay events.
-        -   `BonusPoints`: Sum of bonus points for non-relay events.
-        -   `TotalPoints`: Sum of `PlacePoints` and `BonusPoints`.
+        -   `TimePoints`: Sum of place points for non-relay events.
+        -   `PBPoints`: Sum of PB points for non-relay events.
+        -   `TotalPoints`: Sum of `PlacePoints`, `TimePoints` and `PBPoints`.
         -   `QualificationADVCount`: Number of ADV qualifications.
         -   `QualificationDEVCount`: Number of DEV qualifications.
 
@@ -208,4 +211,4 @@ See the `LICENSE` file for details.
 
 ## Contact
 
-For issues, feature requests, or support, contact [Your Name] at [petr@riveroaks.xyz] or open an issue in the repository (if applicable).
+For issues, feature requests, or support, contact Petr at petr@riveroaks.xyz or open an issue in the repository (if applicable).
