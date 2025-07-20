@@ -73,11 +73,12 @@ swim-results-converter
 #### With Explicit Arguments
 
 ```bash
-swim-results-converter --input-dir meet_results --standardized-dir standardized_results --aggregated-dir aggregated_results
+swim-results-converter --input-dir meet_results --standardized-dir standardized_results --aggregated-dir aggregated_results --aggregate-results
 ```
 
 -   `--input-dir`: Directory containing input Excel files.
 -   `--standardized-dir`: Directory for standardized CSVs.
+-   `--aggregate-results`: Turn aggregate results on.
 -   `--aggregated-dir`: Directory for aggregated CSVs.
 
 ### Option 2: Run Standardization Only
@@ -129,6 +130,7 @@ python src/swim_results_converter/standardize_swim_data.py
         -   `AgeGroup`: Parsed from event (e.g., "12 & Under").
         -   `Distance`: Parsed from event (e.g., "50").
         -   `Stroke`: Parsed from event (e.g., "Freestyle").
+        -   `Category`: Individual event or Relay
         -   `SwimmerName`: Name of the swimmer.
         -   `Age`: Swimmer’s age.
         -   `Team`: Swimmer’s team.
