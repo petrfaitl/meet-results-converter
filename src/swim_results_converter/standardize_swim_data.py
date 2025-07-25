@@ -127,15 +127,14 @@ def calculate_time_points( dq,qualification, event, dev_bonus, adv_bonus):
 def calculate_total_points(place_points, pb_points, time_points):
     
     # Convert points to integers/floats if they are strings
-    place_points = float(place_points) if place_points is not None and str(place_points).strip() else 0
     pb_points = int(pb_points) if pb_points is not None and str(pb_points).strip() else 0
     time_points = int(time_points) if time_points is not None and str(time_points).strip() else 0
 
     # Calculate total points
     total_points = place_points + pb_points + time_points
 
-    logger.debug(f"Calculating total points: place_points={place_points}, pb_points={pb_points}, time_points={time_points}, total_points={total_points}")
-    return total_points if total_points > 0 else None
+    #logger.debug(f"Calculating total points: place_points={place_points}, pb_points={pb_points}, time_points={time_points}, total_points={total_points}")
+    return total_points if total_points > 0 else float(0)
 
 # Function to process a single Excel file
 def process_file(file_path, output_dir, bonus_points):
@@ -169,7 +168,8 @@ def process_file(file_path, output_dir, bonus_points):
             team = row.iloc[3] if pd.notna(row.iloc[3]) else None
             seed_time = row.iloc[4] if pd.notna(row.iloc[4]) else None
             finals_time = row.iloc[7] if pd.notna(row.iloc[7]) else None
-            place_points = row.iloc[10] if pd.notna(row.iloc[10]) else None
+            place_points = row.iloc[10] if pd.notna(row.iloc[10]) else 0
+            decimal_points = row.iloc[11] if pd.notna(row.iloc[11]) else 0 
             rank = row.iloc[13] if pd.notna(row.iloc[13]) else None
             qualification = row.iloc[9] if pd.notna(row.iloc[9]) else None
 
@@ -177,6 +177,11 @@ def process_file(file_path, output_dir, bonus_points):
             dq = None
             if "---" in str(rank):
                 dq = "DQ"
+
+            #Place points and decimal points handling
+            place_points = float(place_points) if place_points is not None and str(place_points).strip() else 0
+            place_points = float(place_points) + float(decimal_points) / 100 if pd.notna(decimal_points) else float(place_points) if place_points is not None else 0
+            
             
             # Skip if critical data is missing
             if not name or not current_event:

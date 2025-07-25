@@ -27,6 +27,7 @@ share/python-wheels/
 MANIFEST
 
 # Own directories
+results
 meet_results/
 meet_results_all
 aggregated_results/
