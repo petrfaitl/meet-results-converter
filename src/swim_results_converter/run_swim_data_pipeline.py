@@ -31,6 +31,8 @@ def main():
     parser.add_argument('--standardized-dir', help='Directory for standardized CSV files (created as standardized_results if not provided)')
     parser.add_argument('--aggregated-dir', help='Directory for aggregated CSV files (created as aggregated_results if not provided)')
     parser.add_argument('--aggregate-results', action='store_true', help='Flag to indicate if aggregation of results should be performed')
+    parser.add_argument('--no-bonus-points', action='store_true', help='Do not calculate bonus points, i.e time points- DEV and ADV, PB points, etc')
+    parser.add_argument('--custom-bonus-points', action='store_true', help='Award custom bonus points for time or PBs. User will be prompted for each value (standard points are "DEV:3, ADV:6, NT:1,PB:2")')
     
     args = parser.parse_args()
 
@@ -58,13 +60,34 @@ def main():
         logger.error("Invalid or missing standardized output directory. Exiting.")
         sys.exit(1)
 
-    
+    # Set custom bonus points if provided
+    if args.custom_bonus_points or args.no_bonus_points:
+        if args.custom_bonus_points:
+            logger.info("Custom bonus points will be set. Please provide values for DEV, ADV, NT, and PB points.")
+            # Prompt for custom bonus points
+            dev_points = input("Enter DEV points (default 3): ").strip() or "3"
+            adv_points = input("Enter ADV points (default 6): ").strip() or "6"
+            nt_points = input("Enter NT points (default 1): ").strip() or "1"
+            pb_points = input("Enter PB points (default 2): ").strip() or "2"
+            custom_bonus_points = {
+                "DEV": dev_points,
+                "ADV": adv_points,
+                "NT": nt_points,
+                "PB": pb_points
+            }
+            logger.info(f"Custom bonus points provided: {custom_bonus_points}")
+        elif args.no_bonus_points:
+            logger.info("No bonus points will be calculated. Setting all bonus points to 0.")
+            custom_bonus_points = {"DEV": "0", "ADV": "0", "NT": "0", "PB": "0"}
+    else:
+        custom_bonus_points = {"DEV": "3", "ADV": "6", "NT": "1", "PB": "2"}
+        logger.info(f"Using default bonus points: {custom_bonus_points}")
 
     # Run standardization script
     logger.info("Running standardization script...")
     try:
         # Create a namespace for arguments
-        standardize_args = argparse.Namespace(input_dir=input_dir, output_dir=standardized_dir)
+        standardize_args = argparse.Namespace(input_dir=input_dir, output_dir=standardized_dir, bonus_points=custom_bonus_points)
         standardize_swim_data.main(standardize_args)
     except Exception as e:
         logger.error(f"Standardization script failed: {e}")

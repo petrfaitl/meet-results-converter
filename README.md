@@ -24,7 +24,7 @@ The **Swim Results Converter** is a Python package designed to standardize and a
 If the package is hosted in a Git repository (e.g., GitHub):
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/petrfaitl/meet-results-converter.git
 cd swim_data_pipeline
 ```
 
@@ -208,8 +208,6 @@ python src/swim_results_converter/standardize_swim_data.py
 MIT License
 
 Copyright (c) 2025 Petr Faitl
-
-See the `LICENSE` file for details.
 
 ## Contact
 

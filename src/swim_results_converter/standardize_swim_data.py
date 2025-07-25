@@ -7,7 +7,7 @@ import logging
 import uuid
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Function to convert time strings (MM:SS.SS or SS.SS) to seconds
@@ -86,32 +86,10 @@ def calculate_time_diff(seed_time, final_time):
         return None
     return round(time_diff, 2)
 
-# Calculate bonus points
-def calculate_bonus_points(seed_time, improvement, dq, qualification, event):
-    # If swimmer was disqualified or event is a relay, return no bonus
-    if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
-        return None
 
-    bonus_points = 0
-
-    # Bonus for not having a seed time
-    if not seed_time or 'NT' in str(seed_time).upper():
-        bonus_points += 1
-
-    # Bonus for improvement (assumes improvement is a negative number)
-    if improvement and float(improvement) < 0:
-        bonus_points += 2
-
-    # Bonus for qualification level
-    if 'ADV' in str(qualification).upper():
-        bonus_points += 6
-    if 'DEV' in str(qualification).upper():
-        bonus_points += 3
-
-    return str(bonus_points) if bonus_points else None
 
 # Calculate PB points
-def calculate_pb_points(seed_time, improvement, dq, event, nt_bonus=1,pb_bonus=2):
+def calculate_pb_points(seed_time, improvement, dq, event, nt_bonus,pb_bonus):
     # If swimmer was disqualified or event is a relay, return no PB points
     if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
         return None
@@ -120,34 +98,33 @@ def calculate_pb_points(seed_time, improvement, dq, event, nt_bonus=1,pb_bonus=2
 
     # If there is no seed time, return no PB points
     if not seed_time or 'NT' in str(seed_time).upper():
-        pb_points += nt_bonus
+        pb_points += int(nt_bonus)
 
     # If improvement is negative, it means the swimmer improved their time
     if improvement and float(improvement) < 0:
-        pb_points += pb_bonus
+        pb_points += int(pb_bonus)
 
 
     return str(pb_points) if pb_points else None
 
 # Calculate time points
-def calculate_time_points( dq,qualification, event, dev_bonus=3, adv_bonus=6):
+def calculate_time_points( dq,qualification, event, dev_bonus, adv_bonus):
     # If swimmer was disqualified or event is a relay, return no time points
     if 'DQ' in str(dq).upper() or 'RELAY' in str(event).upper():
         return None
 
     time_points = 0
-
+ 
     # Add bonus points based on qualification level
     if 'ADV' in str(qualification).upper():
-        time_points += adv_bonus
+        time_points += int(adv_bonus)
     if 'DEV' in str(qualification).upper():
-        time_points += dev_bonus
+        time_points += int(dev_bonus)
 
     return str(time_points) if time_points else None
 
 # Calculate total points
 def calculate_total_points(place_points, pb_points, time_points):
-    logger.debug(f"Calculating total points: place_points={place_points}, pb_points={pb_points}, time_points={time_points}")
     
     # Convert points to integers/floats if they are strings
     place_points = float(place_points) if place_points is not None and str(place_points).strip() else 0
@@ -156,10 +133,12 @@ def calculate_total_points(place_points, pb_points, time_points):
 
     # Calculate total points
     total_points = place_points + pb_points + time_points
+
+    logger.debug(f"Calculating total points: place_points={place_points}, pb_points={pb_points}, time_points={time_points}, total_points={total_points}")
     return total_points if total_points > 0 else None
 
 # Function to process a single Excel file
-def process_file(file_path, output_dir):
+def process_file(file_path, output_dir, bonus_points):
     try:
         logger.info(f"Processing file: {file_path}")
         # Extract meet info
@@ -214,10 +193,10 @@ def process_file(file_path, output_dir):
             improvement = calculate_time_diff(seed_time_seconds, finals_time_seconds)
 
             # Calculate time points
-            time_points = calculate_time_points(dq, qualification, current_event)
+            time_points = calculate_time_points(dq, qualification, current_event,bonus_points['DEV'], bonus_points['ADV'])
 
             # Calculate pb points
-            pb_points = calculate_pb_points(seed_time, improvement, dq, current_event)
+            pb_points = calculate_pb_points(seed_time, improvement, dq, current_event, bonus_points['NT'], bonus_points['PB'])
 
             # Calculate total points
             total_points = calculate_total_points(place_points, pb_points, time_points)
@@ -266,6 +245,7 @@ def process_file(file_path, output_dir):
 def main(args):
     input_dir = args.input_dir
     output_dir = args.output_dir
+    bonus_points = args.bonus_points
     
     # Create output directory if it doesn't exist
     if not os.path.exists(output_dir):
@@ -280,11 +260,12 @@ def main(args):
     
     for file_name in excel_files:
         file_path = os.path.join(input_dir, file_name)
-        process_file(file_path, output_dir)
+        process_file(file_path, output_dir, bonus_points)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Standardize swim meet result Excel files")
     parser.add_argument('--input-dir', default='results', help='Directory containing Excel files')
     parser.add_argument('--output-dir', default='standardized_results', help='Directory to save standardized CSV files')
+    parser.add_argument('--bonus-points', default={"DEV": "3", "ADV": "6", "NT": "1", "PB": "2"}, help='Calculate bonus points')
     args = parser.parse_args()
     main(args)

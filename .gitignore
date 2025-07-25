@@ -219,3 +219,5 @@ __marimo__/
 nuitka-crash-report.xml
 run_swim_data_pipeline.dist
 run_swim_data_pipeline.bin
+src/swim_results_converter/results
+src/results
