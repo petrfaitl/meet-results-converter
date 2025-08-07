@@ -80,6 +80,8 @@ swim-results-converter --input-dir meet_results --standardized-dir standardized_
 -   `--standardized-dir`: Directory for standardized CSVs.
 -   `--aggregate-results`: Turn aggregate results on.
 -   `--aggregated-dir`: Directory for aggregated CSVs.
+-   `--no-bonus-points`: No bonus points are awarded. Only place points if they are a part of the scored results file.
+-   `--custom-bonus-points`: User can specify custom values. Entry of the values via a prompt.
 
 ### Option 2: Run Standardization Only
 

@@ -187,6 +187,11 @@ def process_file(file_path, output_dir, bonus_points):
             if not name or not current_event:
                 continue
             
+            # Swap name and Team name if Relay event
+            if 'Relay' in current_event:
+                if pd.notna(team):
+                    name, team = team.strip(), name.strip()
+
             # Parse event details
             event_details = parse_event_name(current_event)
             
