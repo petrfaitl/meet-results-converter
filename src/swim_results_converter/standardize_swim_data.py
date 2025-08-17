@@ -33,7 +33,7 @@ def convert_time_to_seconds(time_str):
 # Function to extract event details from event name
 def parse_event_name(event_name):
     # Regex to extract gender, age group, distance, and stroke
-    pattern = r'(?P<gender>Girls|Boys|Mixed)\s*(?P<age_group>\d+\s*(&\s*Under|Year\s*Olds|\d+\s*&\s*Over)?)?\s*(?P<distance>\d+)\s*SC\s*Meter\s*(?P<stroke>Freestyle|Butterfly|Medley Relay|Backstroke|Breaststroke|IM|Freestyle\s*Relay)'
+    pattern = r'(?P<gender>Girls|Boys|Mixed|Men|Women)\s*(?P<age_group>\d+-\d+\s*|\d+\s*(&\s*Under|Year\s*Olds|\d+\s*&\s*Over)?)?\s*(?P<distance>\d+)\s*SC\s*Meter\s*(?P<stroke>Freestyle|Butterfly|Medley Relay|Backstroke|Breaststroke|IM|Freestyle\s*Relay)'
     match = re.search(pattern, event_name.strip())
     if match:
         return {
