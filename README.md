@@ -25,14 +25,14 @@ If the package is hosted in a Git repository (e.g., GitHub):
 
 ```bash
 git clone https://github.com/petrfaitl/meet-results-converter.git
-cd swim_data_pipeline
+cd  meet-results-converter
 ```
 
 Alternatively, download and unzip the package archive (`swim_results_converter.zip` or `swim_results_converter.tar.gz`):
 
 ```bash
-unzip swim_results_converter.zip -d swim_data_pipeline
-cd swim_data_pipeline
+unzip swim_results_converter.zip -d  meet-results-converter
+cd  meet-results-converter
 ```
 
 ### Step 2: Install Dependencies
