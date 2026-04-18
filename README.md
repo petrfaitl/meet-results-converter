@@ -16,6 +16,7 @@ The **Swim Results Converter** is a Python package designed to standardize and a
 -   **Dependencies**:
     -   `pandas>=1.5.0`: For data processing.
     -   `openpyxl>=3.0.0`: For reading Excel files.
+    -   `xlrd>=2.0.2`: Reading data and formatting information from Excel files
 
 ## Installation
 
@@ -40,7 +41,7 @@ cd  meet-results-converter
 Install the required Python packages:
 
 ```bash
-pip install pandas openpyxl
+pip install pandas openpyxl xlrd
 ```
 
 ### Step 3: Install the Package
