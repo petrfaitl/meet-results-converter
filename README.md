@@ -28,10 +28,10 @@ git clone https://github.com/petrfaitl/meet-results-converter.git
 cd  meet-results-converter
 ```
 
-Alternatively, download and unzip the package archive (`swim_results_converter.zip` or `swim_results_converter.tar.gz`):
+Alternatively, download and unzip the package archive (`meet-results-converter.zip` or `meet-results-converter.tar.gz`):
 
 ```bash
-unzip swim_results_converter.zip -d  meet-results-converter
+unzip meet-results-converter.zip -d  meet-results-converter
 cd  meet-results-converter
 ```
 
